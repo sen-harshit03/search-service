@@ -3,7 +3,6 @@ server:
 spring:
   application:
     name: search-service
-
   kafka:
     consumer:
       bootstrap-servers: localhost:9092
@@ -13,3 +12,9 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: 'com.tripsy.common'
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+  elasticsearch:
+    uris: "http://localhost:9200"  # ES server URL

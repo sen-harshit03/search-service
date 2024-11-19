@@ -1,6 +1,10 @@
 package com.tripsy.searchservice.messaging;
 
 import com.tripsy.common.PackageSearchPayload;
+import com.tripsy.searchservice.entity.PackageDocument;
+import com.tripsy.searchservice.mapper.PackageDocumentMapper;
+import com.tripsy.searchservice.service.PackageSearchService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -8,12 +12,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class KafkaConsumer {
 
+    private final PackageDocumentMapper packageDocumentMapper;
+    private final PackageSearchService packageSearchService;
+
     @KafkaListener(topics = "package-topic", groupId = "myGroup")
-    public void consumePackage(PackageSearchPayload payload) {
+    public void consumePackage(final PackageSearchPayload payload) {
         try {
             log.info("Consumed payload : {}", payload);
+
+            final PackageDocument packageDocument = mapToPackageDocument(payload);
+
+            packageSearchService.createPackageDocument(packageDocument);
+
         } catch (SerializationException e) {
             log.error("Deserialization error for message. Invalid message format: {}", payload, e);
 
@@ -21,5 +34,9 @@ public class KafkaConsumer {
             log.error("Error while processing message from topic 'package-topic': {}", payload, e);
 
         }
+    }
+
+    private PackageDocument mapToPackageDocument(final PackageSearchPayload payload) {
+        return packageDocumentMapper.toDocument(payload);
     }
 }
