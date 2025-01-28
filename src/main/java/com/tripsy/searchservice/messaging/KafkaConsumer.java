@@ -1,5 +1,6 @@
 package com.tripsy.searchservice.messaging;
 
+import com.tripsy.common.EventType;
 import com.tripsy.common.PackageSearchPayload;
 import com.tripsy.searchservice.entity.PackageDocument;
 import com.tripsy.searchservice.mapper.PackageDocumentMapper;
@@ -22,10 +23,12 @@ public class KafkaConsumer {
     public void consumePackage(final PackageSearchPayload payload) {
         try {
             log.info("Consumed payload : {}", payload);
-
             final PackageDocument packageDocument = mapToPackageDocument(payload);
 
-            packageSearchService.createPackageDocument(packageDocument);
+            switch (payload.getEventType()) {
+                case CREATE, UPDATE -> packageSearchService.upsertDocument(packageDocument);
+                case DELETE -> packageSearchService.deleteDocument(packageDocument.getPackageId());
+            };
 
         } catch (SerializationException e) {
             log.error("Deserialization error for message. Invalid message format: {}", payload, e);

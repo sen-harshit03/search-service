@@ -35,4 +35,47 @@ public interface PackageSearchRepository extends ElasticsearchRepository<Package
 
     Page<PackageDocument> findAll(Pageable pageable);
 
+@Query("""
+    {
+        "bool": {
+            "must": [
+                {
+                    "multi_match": {
+                        "query": "?0",
+                        "fields": ["destinations.destinationName", "destinations.country"]
+                    }
+                }
+            ],
+            "filter": [
+                {
+                    "range": {
+                        "basePrice": {
+                            "gte": ?1,
+                            "lte": ?2
+                        }
+                    }
+                },
+                {
+                    "range": {
+                        "durationInNights": {
+                            "gte": ?3,
+                            "lte": ?4
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    """)
+
+    Page<PackageDocument> searchWithFilters(
+            String keyword,
+            Double minPrice,
+            Double maxPrice,
+            Integer minDuration,
+            Integer maxDuration,
+            Pageable pageable
+    );
+
+
 }
