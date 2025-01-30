@@ -20,7 +20,7 @@ public class PackageDocumentMapper {
     public PackageDocument toDocument(final PackageSearchPayload payload) {
         final PackagePayload packagePayload = payload.getPackagePayload();
 
-        final PackageDocument packageDocument =  PackageDocument.builder()
+        final PackageDocument packageDocument = PackageDocument.builder()
                 .packageId(packagePayload.getPackageId())
                 .title(packagePayload.getTitle())
                 .description(packagePayload.getDescription())

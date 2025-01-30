@@ -67,13 +67,14 @@ public class PackageSearchServiceImpl implements PackageSearchService {
     }
 
     @Override
-    public void upsertDocument(final PackageDocument updatedPackage) {
-        packageSearchRepository.findById(updatedPackage.getPackageId())
+    public void upsertDocument(final PackageDocument document) {
+        log.info("Upserting document: {}", document);
+        packageSearchRepository.findById(document.getPackageId())
                 .ifPresentOrElse(existingPackage -> {
-                            mergeImages(existingPackage, updatedPackage);
-                            packageSearchRepository.save(updatedPackage);
+                            mergeImages(existingPackage, document);
+                            packageSearchRepository.save(document);
                         },
-                        () -> packageSearchRepository.save(updatedPackage));
+                        () -> packageSearchRepository.save(document));
 
     }
 

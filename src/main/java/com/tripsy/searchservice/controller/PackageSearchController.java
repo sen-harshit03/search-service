@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PackageSearchController {
 
     private final PackageSearchService packageSearchService;
+
     @GetMapping
     public ResponseEntity<Page<PackageCardResponseDto>> searchPackages(
             @RequestParam(defaultValue = "0") final Integer page,

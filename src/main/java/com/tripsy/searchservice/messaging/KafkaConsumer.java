@@ -1,6 +1,5 @@
 package com.tripsy.searchservice.messaging;
 
-import com.tripsy.common.EventType;
 import com.tripsy.common.PackageSearchPayload;
 import com.tripsy.searchservice.entity.PackageDocument;
 import com.tripsy.searchservice.mapper.PackageDocumentMapper;
@@ -8,12 +7,14 @@ import com.tripsy.searchservice.service.PackageSearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "messaging.service", havingValue = "kafka")
 public class KafkaConsumer {
 
     private final PackageDocumentMapper packageDocumentMapper;
@@ -28,7 +29,7 @@ public class KafkaConsumer {
             switch (payload.getEventType()) {
                 case CREATE, UPDATE -> packageSearchService.upsertDocument(packageDocument);
                 case DELETE -> packageSearchService.deleteDocument(packageDocument.getPackageId());
-            };
+            }
 
         } catch (SerializationException e) {
             log.error("Deserialization error for message. Invalid message format: {}", payload, e);
